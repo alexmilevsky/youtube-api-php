@@ -30,9 +30,9 @@ function sortByView($array_videos)
 if (!file_exists(__DIR__ . '/vendor/autoload.php')) {
   throw new \Exception('please run "composer require google/apiclient:~2.0" in "' . __DIR__ .'"');
 }
-
 require_once __DIR__ . '/vendor/autoload.php';
 
+// create start form
 $htmlBody = <<<END
 <div id="buttons">
 <form method="GET">
@@ -103,13 +103,11 @@ if (isset($_GET['q'])) {
         <div class="search-item-content">
           <iframe width="640" height="360" src="https://www.youtube.com/embed/%s" frameborder="0" allowfullscreen></iframe>
         </div>
-        %s<br />
       </li>',
           $current->title,
           $current->author,
           $current->date,
-          $current->id,
-          $current->views
+          $current->id
       );
     }
 
