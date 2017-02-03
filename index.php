@@ -1,5 +1,24 @@
 <?php
 
+class Video
+{
+  public $title = '';
+  public $author = '';
+  public $date = '';
+  public $id = 0;
+  public $views = 0;
+}
+
+// sorting views
+function sortByView($array_videos)
+{
+  // sort by view
+  usort($array_videos, function($a, $b){
+    return ($b->views - $a->views);
+  });
+  return $array_videos;
+}
+
 /**
  * Library Requirements
  *
@@ -33,19 +52,19 @@ if (isset($_GET['q'])) {
    * {{ Google Cloud Console }} <{{ https://cloud.google.com/console }}>
    * Please ensure that you have enabled the YouTube Data API for your project.
    */
-  $DEVELOPER_KEY = 'AIzaSyCAKghrx-iQarm9RfDWOH8ssToUzuiSyTo';
+  // reset video array
+  unset($searched_video);
 
+  $DEVELOPER_KEY = 'AIzaSyCAKghrx-iQarm9RfDWOH8ssToUzuiSyTo';
   $client = new Google_Client();
   $client->setDeveloperKey($DEVELOPER_KEY);
   $guzzleClient = new \GuzzleHttp\Client(array( 'curl' => array( CURLOPT_SSL_VERIFYPEER => false, ), ));
   $client->setHttpClient($guzzleClient);
-
   // Define an object that will be used to make all API requests.
   $youtube = new Google_Service_YouTube($client);
 
   $htmlBody = '';
   try {
-
     // Call the search.list method to retrieve results matching the specified
     // query term.
     $searchResponse = $youtube->search->listSearch('id,snippet', array(
@@ -54,28 +73,44 @@ if (isset($_GET['q'])) {
       'order' => 'date',
     ));
 
+    // string for output
     $videos = '';
-
     // Add each result to the appropriate list, and then display the lists of
     // matching videos, channels, and playlists.
     foreach ($searchResponse['items'] as $searchResult) {
       switch ($searchResult['id']['kind']) {
         case 'youtube#video':
-          $videos .= sprintf('
-          <li class="search-item">
-          <a href="" class="search-item-title">%s</a><br />
-          %s<br />
-          %s<br />
-          <div class="search-item-content">
-          <iframe width="640" height="360" src="https://www.youtube.com/embed/%s" frameborder="0" allowfullscreen></iframe>
-          </div>
-          </li>',
-              $searchResult['snippet']['title'],
-              $searchResult['snippet']['channelTitle'],
-              $searchResult['snippet']['publishedAt'],
-              $searchResult['id']['videoId']);
+          $current_video = new Video;
+          $current_video->title = $searchResult['snippet']['title'];
+          $current_video->author = $searchResult['snippet']['channelTitle'];
+          $current_video->date = $searchResult['snippet']['publishedAt'];
+          $current_video->id = $searchResult['id']['videoId'];
+          $current_video->views = json_decode(file_get_contents(sprintf('https://www.googleapis.com/youtube/v3/videos?id=%s&key=AIzaSyCAKghrx-iQarm9RfDWOH8ssToUzuiSyTo&part=statistics', $searchResult['id']['videoId'])))->{'items'}[0]->statistics->viewCount;
+          $searched_video[] = $current_video;
           break;
       }
+    }
+
+    // sort by view
+    $searched_video = sortByView($searched_video);
+
+    foreach ($searched_video as $current) {
+      $videos .= sprintf('
+      <li class="search-item">
+        <a href="" class="search-item-title">%s</a><br />
+        %s<br />
+        %s<br />
+        <div class="search-item-content">
+          <iframe width="640" height="360" src="https://www.youtube.com/embed/%s" frameborder="0" allowfullscreen></iframe>
+        </div>
+        %s<br />
+      </li>',
+          $current->title,
+          $current->author,
+          $current->date,
+          $current->id,
+          $current->views
+      );
     }
 
     // text of search
