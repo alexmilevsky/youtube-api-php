@@ -55,16 +55,25 @@ if (isset($_GET['q'])) {
     ));
 
     $videos = '';
-    $channels = '';
-    $playlists = '';
 
     // Add each result to the appropriate list, and then display the lists of
     // matching videos, channels, and playlists.
     foreach ($searchResponse['items'] as $searchResult) {
       switch ($searchResult['id']['kind']) {
         case 'youtube#video':
-          $videos .= sprintf('<li class="search-item">%s (%s)</li>',
-              $searchResult['snippet']['title'], $searchResult['id']['videoId']);
+          $videos .= sprintf('
+          <li class="search-item">
+          <a href="" class="search-item-title">%s</a><br />
+          %s<br />
+          %s<br />
+          <div class="search-item-content">
+          <iframe width="640" height="360" src="https://www.youtube.com/embed/%s" frameborder="0" allowfullscreen></iframe>
+          </div>
+          </li>',
+              $searchResult['snippet']['title'],
+              $searchResult['snippet']['channelTitle'],
+              $searchResult['snippet']['publishedAt'],
+              $searchResult['id']['videoId']);
           break;
       }
     }
