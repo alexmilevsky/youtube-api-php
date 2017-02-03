@@ -94,21 +94,25 @@ if (isset($_GET['q'])) {
     // sort by view
     $searched_video = sortByView($searched_video);
 
+    $counter = 1;
     foreach ($searched_video as $current) {
       $videos .= sprintf('
       <li class="search-item">
-        <a href="" class="search-item-title">%s</a><br />
+        <a href="#accordion-%s" class="search-item-title">%s</a><br />
         %s<br />
         %s<br />
-        <div class="search-item-content">
+        <div id="accordion-%s" class="search-item-content">
           <iframe width="640" height="360" src="https://www.youtube.com/embed/%s" frameborder="0" allowfullscreen></iframe>
         </div>
       </li>',
+          $counter,
           $current->title,
           $current->author,
           $current->date,
+          $counter,
           $current->id
       );
+      $counter++;
     }
 
     // text of search
@@ -153,5 +157,7 @@ END;
         <?=$htmlBody?>
       </div>
     </section>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="js/accordion.js"></script>
   </body>
 </html>
