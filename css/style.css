@@ -1,0 +1,44 @@
+body {
+  background-color: #f1f1f1;
+}
+
+.container {
+  width: 960px;
+  margin: 0 auto;
+}
+
+.accordion {
+    overflow:hidden;
+}
+
+#query, #search-button {
+  height: 25px;
+  margin: 10px auto;
+  font-size: 1.1em;
+  text-align: center;
+}
+
+#query {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#search-button {
+  display: block;
+}
+
+.search-item {
+  background-color: #fff;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.search-item-title {
+    font-size:1.3em;
+    text-decoration: none;
+}
+
+.search-item-content {
+  padding: 20px 0;
+    display:none;
+}
